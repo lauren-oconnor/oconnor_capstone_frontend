@@ -7,6 +7,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+
   const MyApp({super.key});
 
   @override
@@ -33,6 +34,7 @@ class HomePageState extends State<HomePage> {
   String greetings = "";
   String city = "";
   String finalResponse = "";
+
   final formKey = GlobalKey<FormState>();
 
   Future<void> savingData() async {
@@ -54,52 +56,55 @@ class HomePageState extends State<HomePage> {
     );
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SizedBox(width: double.infinity,
-          child: Column(crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-              const SizedBox(height: 200),
-          SizedBox(width: 350,
-            child: Form(key: formKey,
+      body: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(height: 200),
+            SizedBox(width: 350,
+              child: Form(
+                key: formKey,
                 child: TextFormField(
                     decoration: InputDecoration(
-                      labelText: 'Enter your city: ',
+                      labelText: 'Select your city: ',
                       enabledBorder: inputFormDeco(),
                       focusedBorder: inputFormDeco(),
                     ),
                     onSaved: (value) {
                       city = value!;
                     },
-                ),
+                 ),
+               ),
             ),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              savingData();
-              const url = 'http://127.0.0.1:5000/';
-              final response = await http.post(
-                  Uri.parse(url),
-                  body: json.encode({'city': city})
-              );
-              print(city);
-            },
-            child: const Text('SEND'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              const url = 'http://127.0.0.1:5000/';
-              final response = await http.get(Uri.parse(url));
-              final decoded = json.decode(response.body) as Map<String, dynamic>;
-              setState(() {
-                finalResponse = decoded['city'];
-                print(finalResponse);
-              });
-            },
-            child: const Text('GET'),
-          ),
-          //print(finalResponse);
-          Text(finalResponse, style: const TextStyle(fontSize: 24))
+            ElevatedButton(
+              onPressed: () async {
+                savingData();
+                const url = 'http://127.0.0.1:5000/';
+                final response = await http.post(
+                    Uri.parse(url),
+                    body: json.encode({'city': city})
+                );
+                print(city);
+              },
+              child: const Text('SEND'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                const url = 'http://127.0.0.1:5000/';
+                final response = await http.get(Uri.parse(url));
+                final decoded = json.decode(response.body) as Map<String, dynamic>;
+                setState(() {
+                  finalResponse = decoded['city'];
+                  //print(finalResponse);
+                });
+              },
+              child: const Text('GET'),
+            ),
+            Text(finalResponse, style: const TextStyle(fontSize: 24))
           ],
         ),
       ),
