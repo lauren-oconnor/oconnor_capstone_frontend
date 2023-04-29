@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'widgets/recyclable.dart';
 
 void main() {
   runApp(const MyApp());
@@ -36,6 +37,8 @@ class HomePageState extends State<HomePage> {
   String finalResponse = "";
 
   final formKey = GlobalKey<FormState>();
+
+  get recyclableForm => null;
 
   Future<void> savingData() async {
     final validation = formKey.currentState?.validate();
@@ -104,10 +107,12 @@ class HomePageState extends State<HomePage> {
               },
               child: const Text('GET'),
             ),
-            Text(finalResponse, style: const TextStyle(fontSize: 24))
+            Text(finalResponse, style: const TextStyle(fontSize: 24)),
+            RecyclableForm(),
           ],
         ),
       ),
+
     );
   }
 }
