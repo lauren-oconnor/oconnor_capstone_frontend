@@ -3,6 +3,25 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'widgets/recyclable.dart';
 
+OutlineInputBorder inputFormDeco() {
+  return OutlineInputBorder(
+    borderRadius: BorderRadius.circular(20.0),
+    borderSide:
+    const BorderSide(
+        width: 1.0,
+        color: Colors.lightGreen,
+        style: BorderStyle.solid),
+  );
+}
+
+Future<void> savingData(formKey) async {
+  final validation = formKey.currentState?.validate();
+  if (!validation!) {
+    return;
+  }
+  formKey.currentState!.save();
+}
+
 void main() {
   runApp(const MyApp());
 }
@@ -14,14 +33,35 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(debugShowCheckedModeBanner: false,
-      title: 'Flutter to Python',
+      title: 'Recyclops Recycling App',
       theme: ThemeData(
         primarySwatch: Colors.lightGreen,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const HomePage(),
+      initialRoute: "/location",
+      routes: {
+        "/home": (context) => const HomePage(),
+        "/location": (context) => const LocationPage(),
+        "/locationFeedback": (context) => const LocationFeedbackPage()
+        //"/recyclable": (context) => const Recyclable(),
+      }
+      //home: const HomePage(),
     );
   }
+}
+
+class LocationFeedbackPage extends StatefulWidget{
+  const LocationFeedbackPage({super.key});
+
+  @override
+  LocationFeedbackPageState createState() => LocationFeedbackPageState();
+}
+
+class LocationPage extends StatefulWidget{
+  const LocationPage({super.key});
+
+  @override
+  LocationPageState createState() => LocationPageState();
 }
 
 class HomePage extends StatefulWidget {
@@ -29,6 +69,99 @@ class HomePage extends StatefulWidget {
 
   @override
   HomePageState createState() => HomePageState();
+}
+
+class LocationPageState extends State<LocationPage> {
+  final formKey2 = GlobalKey<FormState>();
+  String city = "";
+  String finalResponse = "";
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        body: SizedBox(
+          width: double.infinity,
+          child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(height: 200),
+            SizedBox(width: 350,
+              child: Form(
+              key: formKey2,
+              child: TextFormField(
+                  decoration: InputDecoration(
+                    labelText: 'Enter your city\'s name: ',
+                    enabledBorder: inputFormDeco(),
+                    focusedBorder: inputFormDeco(),
+                  ),
+                  onSaved: (value) {
+                    city = value!;
+                  },
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                savingData(formKey2);
+                const url = 'http://127.0.0.1:5000/city';
+                final response = await http.post(
+                    Uri.parse(url),
+                    body: json.encode({'city': city}));
+                String cityResult = city;
+                Navigator.of(context).pushNamed('/locationFeedback', arguments: cityResult);
+              },
+              child: const Text('Submit'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class LocationFeedbackPageState extends State<LocationFeedbackPage> {
+  String greetings = "";
+  String city = "denver";
+  String finalResponse = "feedback...";
+
+  final formKey = GlobalKey<FormState>();
+
+  get recyclableForm => null;
+
+  Future<void> savingData() async {
+    final validation = formKey.currentState?.validate();
+    if (!validation!) {
+      return;
+    }
+    formKey.currentState!.save();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SizedBox(
+        width: double.infinity,
+
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            ElevatedButton(
+            onPressed: () async {
+      const url = 'http://127.0.0.1:5000/city';
+      final response = await http.get(Uri.parse(url));
+      final decoded = json.decode(response.body) as Map<String, dynamic>;
+      setState(() {
+      finalResponse = decoded[city];
+      });
+      },
+        child: const Text('GET')
+            ),
+            Text(finalResponse, style: const TextStyle(fontSize: 24)),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class HomePageState extends State<HomePage> {
@@ -73,7 +206,7 @@ class HomePageState extends State<HomePage> {
                 key: formKey,
                 child: TextFormField(
                     decoration: InputDecoration(
-                      labelText: 'Select your city: ',
+                      labelText: 'Enter your city\'s name: ',
                       enabledBorder: inputFormDeco(),
                       focusedBorder: inputFormDeco(),
                     ),
@@ -86,23 +219,21 @@ class HomePageState extends State<HomePage> {
             ElevatedButton(
               onPressed: () async {
                 savingData();
-                const url = 'http://127.0.0.1:5000/';
+                const url = 'http://127.0.0.1:5000/city';
                 final response = await http.post(
                     Uri.parse(url),
                     body: json.encode({'city': city})
                 );
-                print(city);
               },
               child: const Text('SEND'),
             ),
             ElevatedButton(
               onPressed: () async {
-                const url = 'http://127.0.0.1:5000/';
+                const url = 'http://127.0.0.1:5000/city';
                 final response = await http.get(Uri.parse(url));
                 final decoded = json.decode(response.body) as Map<String, dynamic>;
                 setState(() {
                   finalResponse = decoded['city'];
-                  //print(finalResponse);
                 });
               },
               child: const Text('GET'),
@@ -112,7 +243,6 @@ class HomePageState extends State<HomePage> {
           ],
         ),
       ),
-
     );
   }
 }
