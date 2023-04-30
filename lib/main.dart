@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
       routes: {
         "/home": (context) => const HomePage(),
         "/location": (context) => const LocationPage(),
-        "/locationFeedback": (context) => const LocationFeedbackPage()
+        //"/locationFeedback": (context) => const LocationFeedbackPage(),
         //"/recyclable": (context) => const Recyclable(),
       }
       //home: const HomePage(),
@@ -55,7 +55,8 @@ class MyApp extends StatelessWidget {
 
 
 class LocationFeedbackPage extends StatefulWidget{
-  const LocationFeedbackPage({super.key});
+  const LocationFeedbackPage({super.key});//, required this.city});
+  //final String city;
 
   @override
   LocationFeedbackPageState createState() => LocationFeedbackPageState();
@@ -75,6 +76,31 @@ class HomePage extends StatefulWidget {
 
   @override
   HomePageState createState() => HomePageState();
+}
+
+
+class LocationFeedbackScreen extends StatelessWidget {
+  const LocationFeedbackScreen({super.key, required this.city});
+  final String city;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(city),
+      ),
+      body: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            //Text(city),
+            RecyclableForm(city: city)
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 
@@ -139,9 +165,14 @@ class LocationPageState extends State<LocationPage> {
             ElevatedButton(
                 onPressed: _cityFound
                     ? () {
-                      Future.delayed(const Duration(milliseconds: 1000), () {
-                      var res = Navigator.of(context).pushNamed('/locationFeedback');
-                      });}
+                  Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => LocationFeedbackScreen(city: city)));
+                  //Navigator.pushNamed(context, '/locationFeedback', arguments: city);
+                      /*Future.delayed(const Duration(milliseconds: 1000), () {
+                      var res = Navigator.of(context).pushNamed('/locationFeedback', arguments: city);
+                      //var res = Navigator.of(context).push(MaterialPageRoute(builder: (context) => City(data: city)));
+                      });*/
+                }
                     : null,
                 child: const Text('onward -->'),
             )
@@ -167,42 +198,6 @@ class LocationPageState extends State<LocationPage> {
   }
 }
 
-
-class LocationFeedbackPageState extends State<LocationFeedbackPage> {
-  String message = "temp message";
-  funkyTown(context) {
-    message = 'funky town';
-    print('funky town!!');
-    return message;
-  }
-  String greetings = "";
-  String city = "denver";
-  String finalResponse = "feedback...";
-
-
-  final formKey = GlobalKey<FormState>();
-  //get recyclableForm => null;
-
-  // take an action upon page load:
-  @override
-  Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) => message = funkyTown(context));
-
-    return Scaffold(
-      body: SizedBox(
-        width: double.infinity,
-
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            RecyclableForm(),
-            Text(message, style: const TextStyle(fontSize: 24)),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class HomePageState extends State<HomePage> {
   String greetings = "";
@@ -279,7 +274,7 @@ class HomePageState extends State<HomePage> {
               child: const Text('GET'),
             ),
             Text(finalResponse, style: const TextStyle(fontSize: 24)),
-            RecyclableForm(),
+            RecyclableForm(city: city),
           ],
         ),
       ),
@@ -517,3 +512,41 @@ class MainScreenState extends State<MainScreen> {
   }
 
 */
+
+
+class LocationFeedbackPageState extends State<LocationFeedbackPage> {
+  String city = "city goes here...";
+  /*
+  getData(context) async {
+    var res = await Navigator.of(context).pushNamed('/location');
+
+    if (res != null) {
+      message = res as String;
+      print(message);
+    }
+    return message;
+  }
+*/
+  final formKey = GlobalKey<FormState>();
+  //get recyclableForm => null;
+
+  @override
+  Widget build(BuildContext context) {
+    //WidgetsBinding.instance.addPostFrameCallback((_) => message = getData(context));
+
+    return Scaffold(
+      body: SizedBox(
+        width: double.infinity,
+
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            RecyclableForm(city: city),
+            Text(city, style: const TextStyle(fontSize: 24)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+

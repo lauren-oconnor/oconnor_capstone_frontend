@@ -4,7 +4,8 @@ import 'dart:convert';
 
 
 class RecyclableForm extends StatefulWidget {
-  const RecyclableForm({super.key});
+  const RecyclableForm({super.key, required this.city});
+  final String city;
 
   @override
   RecyclableFormState createState() {
@@ -13,8 +14,10 @@ class RecyclableForm extends StatefulWidget {
 }
 
 class RecyclableFormState extends State<RecyclableForm> {
+  int num = 2;
+  String shape = 'wide mouth bottle';
   final formKey = GlobalKey<FormState>();
-  String selectedValue = "paper";
+  String selectedValue = "plastic";
 
   List<String> menuItems2 = ["paper", "glass", "plastic", "metal", "styrofoam"];
 
@@ -63,7 +66,7 @@ class RecyclableFormState extends State<RecyclableForm> {
               const url = 'http://127.0.0.1:5000/locationFeedback';
               final response = await http.post(
                 Uri.parse(url),
-                body: json.encode({'selectedMaterial': selectedValue})
+                body: json.encode({'selectedMaterial': selectedValue, 'shape': shape, 'num': num, 'city': widget.city})
               );
               setState(() {
                 selectedValue = newValue!;
