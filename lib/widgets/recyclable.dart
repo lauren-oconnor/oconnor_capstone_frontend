@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 
 class RecyclableForm extends StatefulWidget {
   const RecyclableForm({super.key});
@@ -23,7 +26,7 @@ class RecyclableFormState extends State<RecyclableForm> {
     const DropdownMenuItem(value: "styrofoam", child: Text("Styrofoam"))
   ];
 
-  Future<void> savingData() async {
+  Future<void> savingData(formKey) async {
     final validation = formKey.currentState?.validate();
     if (!validation!) {
       return;
@@ -55,17 +58,35 @@ class RecyclableFormState extends State<RecyclableForm> {
             ),
             value: selectedValue,
             items: menuItems,
-            onChanged: (String? newValue) {
+            onChanged: (String? newValue) async {
+              savingData(formKey);
+              const url = 'http://127.0.0.1:5000/locationFeedback';
+              final response = await http.post(
+                Uri.parse(url),
+                body: json.encode({'selectedMaterial': selectedValue})
+              );
               setState(() {
                 selectedValue = newValue!;
+                print(selectedValue);
               });
             },
           ),
           ElevatedButton(
-              onPressed: savingData,
+              onPressed: () {
+                print("is recyclable pressed");
+                //getData from backend,
+              },
               child: const Text("Is this recyclable?"))
         ],
       ),
     );
   }
+}
+
+Future<void> savingData(formKey) async {
+  final validation = formKey.currentState?.validate();
+  if (!validation!) {
+    return;
+  }
+  formKey.currentState!.save();
 }

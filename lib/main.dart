@@ -3,6 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'widgets/recyclable.dart';
 
+
+void main() {
+  runApp(const MyApp());
+}
+
 OutlineInputBorder inputFormDeco() {
   return OutlineInputBorder(
     borderRadius: BorderRadius.circular(20.0),
@@ -14,6 +19,7 @@ OutlineInputBorder inputFormDeco() {
   );
 }
 
+
 Future<void> savingData(formKey) async {
   final validation = formKey.currentState?.validate();
   if (!validation!) {
@@ -22,9 +28,6 @@ Future<void> savingData(formKey) async {
   formKey.currentState!.save();
 }
 
-void main() {
-  runApp(const MyApp());
-}
 
 class MyApp extends StatelessWidget {
 
@@ -50,12 +53,14 @@ class MyApp extends StatelessWidget {
   }
 }
 
+
 class LocationFeedbackPage extends StatefulWidget{
   const LocationFeedbackPage({super.key});
 
   @override
   LocationFeedbackPageState createState() => LocationFeedbackPageState();
 }
+
 
 class LocationPage extends StatefulWidget{
   const LocationPage({super.key});
@@ -64,6 +69,7 @@ class LocationPage extends StatefulWidget{
   LocationPageState createState() => LocationPageState();
 }
 
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -71,10 +77,12 @@ class HomePage extends StatefulWidget {
   HomePageState createState() => HomePageState();
 }
 
+
 class LocationPageState extends State<LocationPage> {
   final formKey2 = GlobalKey<FormState>();
   String city = "";
   String finalResponse = "";
+  bool _cityFound = false;
 
   @override
   Widget build(BuildContext context) {
@@ -106,38 +114,80 @@ class LocationPageState extends State<LocationPage> {
                 const url = 'http://127.0.0.1:5000/city';
                 final response = await http.post(
                     Uri.parse(url),
+                    body: json.encode({'city': city})
+                );
+              },
+              child: const Text('submit'),
+
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                const url = 'http://127.0.0.1:5000/city';
+                final response = await http.get(Uri.parse(url));
+                final decoded = json.decode(response.body) as Map<String, dynamic>;
+                setState(() {
+                  finalResponse = decoded['city'];
+                  print(finalResponse);
+                });
+                if (finalResponse[0] == 'L') {
+                  _cityFound = true;
+                }
+              },
+              child: const Text('GET'),
+            ),
+            Text(finalResponse, style: const TextStyle(fontSize: 24)),
+            ElevatedButton(
+                onPressed: _cityFound
+                    ? () {
+                      Future.delayed(const Duration(milliseconds: 1000), () {
+                      var res = Navigator.of(context).pushNamed('/locationFeedback');
+                      });}
+                    : null,
+                child: const Text('onward -->'),
+            )
+    /*onPressed: () async {
+                savingData(formKey2);
+                const url = 'http://127.0.0.1:5000/city';
+                final response = await http.post(
+                    Uri.parse(url),
                     body: json.encode({'city': city}));
                 String cityResult = city;
-                Navigator.of(context).pushNamed('/locationFeedback', arguments: cityResult);
+                await Future.delayed(const Duration(seconds: 1));
+                if (!context.mounted) return;
+                Navigator.of(context).pop(); //pushNamed('/locationFeedback');
               },
               child: const Text('Submit'),
             ),
+            */
           ],
         ),
+    //}
       ),
     );
   }
 }
 
+
 class LocationFeedbackPageState extends State<LocationFeedbackPage> {
+  String message = "temp message";
+  funkyTown(context) {
+    message = 'funky town';
+    print('funky town!!');
+    return message;
+  }
   String greetings = "";
   String city = "denver";
   String finalResponse = "feedback...";
 
+
   final formKey = GlobalKey<FormState>();
+  //get recyclableForm => null;
 
-  get recyclableForm => null;
-
-  Future<void> savingData() async {
-    final validation = formKey.currentState?.validate();
-    if (!validation!) {
-      return;
-    }
-    formKey.currentState!.save();
-  }
-
+  // take an action upon page load:
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) => message = funkyTown(context));
+
     return Scaffold(
       body: SizedBox(
         width: double.infinity,
@@ -145,18 +195,8 @@ class LocationFeedbackPageState extends State<LocationFeedbackPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            ElevatedButton(
-            onPressed: () async {
-      const url = 'http://127.0.0.1:5000/city';
-      final response = await http.get(Uri.parse(url));
-      final decoded = json.decode(response.body) as Map<String, dynamic>;
-      setState(() {
-      finalResponse = decoded[city];
-      });
-      },
-        child: const Text('GET')
-            ),
-            Text(finalResponse, style: const TextStyle(fontSize: 24)),
+            RecyclableForm(),
+            Text(message, style: const TextStyle(fontSize: 24)),
           ],
         ),
       ),
