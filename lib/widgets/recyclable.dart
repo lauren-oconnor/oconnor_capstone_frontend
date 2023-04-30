@@ -16,6 +16,7 @@ class RecyclableForm extends StatefulWidget {
 class RecyclableFormState extends State<RecyclableForm> {
   int num = 2;
   String shape = 'narrow mouth bottle';
+  String instructions = '';
   final formKey = GlobalKey<FormState>();
   //final formKey2 = GlobalKey<FormState>();
 
@@ -109,20 +110,28 @@ class RecyclableFormState extends State<RecyclableForm> {
             onChanged: (String? newValue) async {
               savingData(formKey);
 
+              const url = 'http://127.0.0.1:5000/locations';
+              final response = await http.get(Uri.parse(url));
+              final decoded = json.decode(response.body) as Map<String, dynamic>;
+              setState(() {
+                instructions = decoded['instructions'];
+                material = newValue!;
+                print(material);
+              });
+
+              print(instructions);
+
               /*
               const url = 'http://127.0.0.1:5000/locationFeedback';
               final response = await http.post(
                 Uri.parse(url),
                 body: json.encode({'selectedMaterial': selectedValue, 'shape': shape, 'num': num, 'city': widget.city})
               );*/
-              setState(() {
-                material = newValue!;
-                print(material);
-              });
+
 
             },
           ),
-
+          Text(instructions),
           /*if (material == 'plastic')
             DropdownButtonFormField<String>(
               decoration: InputDecoration(
