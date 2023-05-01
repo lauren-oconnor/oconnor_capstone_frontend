@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'widgets/recyclable.dart';
+import 'widgets/form.dart';
 import 'utilities.dart';
 
 OutlineInputBorder inputFormDeco() {
@@ -22,4 +22,31 @@ Future<void> savingData(formKey) async {
     return;
   }
   formKey.currentState!.save();
+}
+
+///Adds state initiation capabilities to Stateless widgets.
+///
+/// see:
+///citation: https://medium.com/filledstacks/how-to-call-a-function-on-start-in-flutter-stateless-widgets-28d90ab3bf49
+class StatefulWrapper extends StatefulWidget {
+  final Function onInit;
+  final Widget child;
+  const StatefulWrapper({super.key, required this.onInit, required this.child});
+
+  @override
+  StatefulWrapperState createState() => StatefulWrapperState();
+}
+
+
+class StatefulWrapperState extends State<StatefulWrapper> {
+  @override
+  void initState() {
+    widget.onInit();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.child;
+  }
 }
