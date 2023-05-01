@@ -2,12 +2,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'widgets/recyclable.dart';
+import 'utilities.dart';
 
 
 void main() {
   runApp(const MyApp());
 }
-
+/*
 OutlineInputBorder inputFormDeco() {
   return OutlineInputBorder(
     borderRadius: BorderRadius.circular(20.0),
@@ -27,10 +28,9 @@ Future<void> savingData(formKey) async {
   }
   formKey.currentState!.save();
 }
-
+*/
 
 class MyApp extends StatelessWidget {
-
   const MyApp({super.key});
 
   @override
@@ -45,29 +45,11 @@ class MyApp extends StatelessWidget {
       routes: {
         "/home": (context) => const HomePage(),
         "/location": (context) => const LocationPage(),
-        //"/locationFeedback": (context) => const LocationFeedbackPage(),
-        //"/recyclable": (context) => const Recyclable(),
+        "/neuralNetwork": (context) => const NeuralNetPage(),
       }
       //home: const HomePage(),
     );
   }
-}
-
-
-class LocationFeedbackPage extends StatefulWidget{
-  const LocationFeedbackPage({super.key});//, required this.city});
-  //final String city;
-
-  @override
-  LocationFeedbackPageState createState() => LocationFeedbackPageState();
-}
-
-
-class LocationPage extends StatefulWidget{
-  const LocationPage({super.key});
-
-  @override
-  LocationPageState createState() => LocationPageState();
 }
 
 
@@ -79,24 +61,74 @@ class HomePage extends StatefulWidget {
 }
 
 
+class LocationPage extends StatefulWidget{
+  const LocationPage({super.key});
+
+  @override
+  LocationPageState createState() => LocationPageState();
+}
+
+
+class NeuralNetPage extends StatefulWidget{
+  const NeuralNetPage({super.key});
+
+  @override
+  NeuralNetPageState createState() => NeuralNetPageState();
+}
+
+
+class LocationFeedbackPage extends StatefulWidget{
+  const LocationFeedbackPage({super.key});//, required this.city});
+  //final String city;
+
+  @override
+  LocationFeedbackPageState createState() => LocationFeedbackPageState();
+}
+
+///Adds state initiation capabilities to Stateless widgets.
+///
+/// see:
+///citation: https://medium.com/filledstacks/how-to-call-a-function-on-start-in-flutter-stateless-widgets-28d90ab3bf49
+
+class StatefulWrapper extends StatefulWidget {
+  final Function onInit;
+  final Widget child;
+  const StatefulWrapper({super.key, required this.onInit, required this.child});
+
+  @override
+  StatefulWrapperState createState() => StatefulWrapperState();
+}
+
+
 class LocationFeedbackScreen extends StatelessWidget {
   const LocationFeedbackScreen({super.key, required this.city});
+
   final String city;
+  final String message = '\n\n\tSorry, you\'re on your own. Recyclops doesn\'t yet have data on recycling\n capabilities for this city';
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(city),
-      ),
-      body: SizedBox(
-        width: double.infinity,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            //Text(city),
-            RecyclableForm(city: city)
-          ],
+    return StatefulWrapper(
+      onInit: () {
+        print('doing stuff...');
+        const Text('doing stuff');
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(city),
+        ),
+        body: SizedBox(
+          width: double.infinity,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              //Text(city),
+              if (city == 'denver' || city == 'anchorage')
+                RecyclableForm(city: city)
+              else
+                Text(message, style: const TextStyle(fontSize: 24))
+            ],
+          ),
         ),
       ),
     );
@@ -104,97 +136,16 @@ class LocationFeedbackScreen extends StatelessWidget {
 }
 
 
-class LocationPageState extends State<LocationPage> {
-  final formKey2 = GlobalKey<FormState>();
-  String city = "";
-  String finalResponse = "";
-  bool _cityFound = false;
+class StatefulWrapperState extends State<StatefulWrapper> {
+  @override
+  void initState() {
+    widget.onInit();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: SizedBox(
-          width: double.infinity,
-          child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 200),
-            SizedBox(width: 350,
-              child: Form(
-              key: formKey2,
-              child: TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'Enter your city\'s name: ',
-                    enabledBorder: inputFormDeco(),
-                    focusedBorder: inputFormDeco(),
-                  ),
-                  onSaved: (value) {
-                    city = value!;
-                  },
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                savingData(formKey2);
-                const url = 'http://127.0.0.1:5000/city';
-                final response = await http.post(
-                    Uri.parse(url),
-                    body: json.encode({'city': city})
-                );
-              },
-              child: const Text('submit'),
-
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                const url = 'http://127.0.0.1:5000/city';
-                final response = await http.get(Uri.parse(url));
-                final decoded = json.decode(response.body) as Map<String, dynamic>;
-                setState(() {
-                  finalResponse = decoded['city'];
-                  print(finalResponse);
-                });
-                if (finalResponse[0] == 'L') {
-                  _cityFound = true;
-                }
-              },
-              child: const Text('GET'),
-            ),
-            Text(finalResponse, style: const TextStyle(fontSize: 24)),
-            ElevatedButton(
-                onPressed: _cityFound
-                    ? () {
-                  Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => LocationFeedbackScreen(city: city)));
-                  //Navigator.pushNamed(context, '/locationFeedback', arguments: city);
-                      /*Future.delayed(const Duration(milliseconds: 1000), () {
-                      var res = Navigator.of(context).pushNamed('/locationFeedback', arguments: city);
-                      //var res = Navigator.of(context).push(MaterialPageRoute(builder: (context) => City(data: city)));
-                      });*/
-                }
-                    : null,
-                child: const Text('onward -->'),
-            )
-    /*onPressed: () async {
-                savingData(formKey2);
-                const url = 'http://127.0.0.1:5000/city';
-                final response = await http.post(
-                    Uri.parse(url),
-                    body: json.encode({'city': city}));
-                String cityResult = city;
-                await Future.delayed(const Duration(seconds: 1));
-                if (!context.mounted) return;
-                Navigator.of(context).pop(); //pushNamed('/locationFeedback');
-              },
-              child: const Text('Submit'),
-            ),
-            */
-          ],
-        ),
-    //}
-      ),
-    );
+    return widget.child;
   }
 }
 
@@ -203,7 +154,6 @@ class HomePageState extends State<HomePage> {
   String greetings = "";
   String city = "";
   String finalResponse = "";
-
   final formKey = GlobalKey<FormState>();
 
   get recyclableForm => null;
@@ -215,7 +165,7 @@ class HomePageState extends State<HomePage> {
     }
     formKey.currentState!.save();
   }
-
+/*
   OutlineInputBorder inputFormDeco() {
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(20.0),
@@ -223,13 +173,17 @@ class HomePageState extends State<HomePage> {
       const BorderSide(
           width: 1.0,
           color: Colors.lightGreen,
-          style: BorderStyle.solid),
+          style: BorderStyle.solid
+      ),
     );
   }
-
+*/
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+          title: const Text('Recyclops Recycling App')
+      ),
       body: SizedBox(
         width: double.infinity,
         child: Column(
@@ -240,16 +194,16 @@ class HomePageState extends State<HomePage> {
               child: Form(
                 key: formKey,
                 child: TextFormField(
-                    decoration: InputDecoration(
-                      labelText: 'Enter your city\'s name: ',
-                      enabledBorder: inputFormDeco(),
-                      focusedBorder: inputFormDeco(),
-                    ),
-                    onSaved: (value) {
-                      city = value!;
-                    },
-                 ),
-               ),
+                  decoration: InputDecoration(
+                    labelText: 'Enter your city\'s name: ',
+                    enabledBorder: inputFormDeco(),
+                    focusedBorder: inputFormDeco(),
+                  ),
+                  onSaved: (value) {
+                    city = value!;
+                  },
+                ),
+              ),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -281,6 +235,163 @@ class HomePageState extends State<HomePage> {
     );
   }
 }
+
+
+class LocationPageState extends State<LocationPage> {
+  final formKey = GlobalKey<FormState>();
+  String city = "";
+  //bool _cityFound = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+          title: const Text('Recyclops Location Selection')
+      ),
+      body: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(height: 200),
+            SizedBox(width: 350,
+              child: Form(
+                key: formKey,
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    labelText: 'Enter your city\'s name: ',
+                    enabledBorder: inputFormDeco(),
+                    focusedBorder: inputFormDeco(),
+                  ),
+                  onFieldSubmitted: (value){
+                    city = value!;
+                    city = city.toLowerCase();
+                    savingData(formKey);
+                    Navigator.push(context, MaterialPageRoute(
+                        builder: (context) => LocationFeedbackScreen(city: city))
+                    );
+                  },
+                ),
+              ),
+            ),
+            /* ElevatedButton(
+                      onPressed: () async {
+                        savingData(formKey);
+                        const url = 'http://127.0.0.1:5000/city';
+                        final response = await http.post(
+                            Uri.parse(url),
+                            body: json.encode({'city': city})
+                        );
+                      },
+                      child: const Text('submit'),
+
+                    ),*/
+            ElevatedButton(
+                onPressed: () async {
+                  savingData(formKey);
+                  const url = 'http//127.0.0.1:/city';
+                  final response = await http.post(
+                      Uri.parse(url), body: json.encode({'city': city})
+                  );
+                  Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => LocationFeedbackScreen(city: city))
+                  );
+                },
+                child: const Text('multi button')
+            ),
+            /*ElevatedButton(
+                      onPressed: () async {
+                        const url = 'http://127.0.0.1:5000/city';
+                        final response = await http.get(Uri.parse(url));
+                        final decoded = json.decode(response.body) as Map<String, dynamic>;
+                        setState(() {
+                          finalResponse = decoded['city'];
+                          print(finalResponse);
+                        });
+                        if (finalResponse[0] == 'L') {
+                          _cityFound = true;
+                        }
+                      },
+                      child: const Text('GET'),
+                    ),*/
+            //Text(finalResponse, style: const TextStyle(fontSize: 24)),
+            /*ElevatedButton(
+                        onPressed: _cityFound
+                            ? () {
+                            Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => LocationFeedbackScreen(city: city)));
+                            }
+                            : null,
+                        child: const Text('onward -->'),
+                    )*/
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+class NeuralNetPageState extends State<NeuralNetPage> {
+  String message = '';
+  String finalMessage = 'message...';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Features of the Recyclops Neural Network')
+        ),
+        body: Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              ElevatedButton(
+              onPressed: () async {
+                const url = 'http://127.0.0.1:5000/neuralNetwork';
+                final message = await http.get(Uri.parse(url));
+                final decoded = json.decode(message.body) as Map<String, dynamic>;
+                setState(() {
+                  finalMessage = decoded['message'];
+                  print(finalMessage);
+                });
+              },
+              child: const Text('get shape of input data')
+            ),
+          Text(finalMessage, style: const TextStyle(fontSize: 24)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+class LocationFeedbackPageState extends State<LocationFeedbackPage> {
+  String city = "city goes here...";
+  final formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+          title: const Text('Recyclops Material Selection')
+      ),
+      body: SizedBox(
+        width: double.infinity,
+
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            RecyclableForm(city: city),
+            Text(city, style: const TextStyle(fontSize: 24)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 
 /*
   @override
@@ -512,41 +623,3 @@ class MainScreenState extends State<MainScreen> {
   }
 
 */
-
-
-class LocationFeedbackPageState extends State<LocationFeedbackPage> {
-  String city = "city goes here...";
-  /*
-  getData(context) async {
-    var res = await Navigator.of(context).pushNamed('/location');
-
-    if (res != null) {
-      message = res as String;
-      print(message);
-    }
-    return message;
-  }
-*/
-  final formKey = GlobalKey<FormState>();
-  //get recyclableForm => null;
-
-  @override
-  Widget build(BuildContext context) {
-    //WidgetsBinding.instance.addPostFrameCallback((_) => message = getData(context));
-
-    return Scaffold(
-      body: SizedBox(
-        width: double.infinity,
-
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            RecyclableForm(city: city),
-            Text(city, style: const TextStyle(fontSize: 24)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../utilities.dart';
 
 
 class RecyclableForm extends StatefulWidget {
@@ -17,12 +18,10 @@ class RecyclableFormState extends State<RecyclableForm> {
   int num = 2;
   String shape = 'narrow mouth bottle';
   String instructions = '';
-  final formKey = GlobalKey<FormState>();
-  //final formKey2 = GlobalKey<FormState>();
-
+  String finalResponse = '';
   String material = "glass";
 
-  List<String> menuItems2 = ["paper", "glass", "plastic", "metal", "styrofoam"];
+  final formKey = GlobalKey<FormState>();
 
   List<DropdownMenuItem<String>> menuItems = [
     const DropdownMenuItem(value: "paper", child: Text("Paper")),
@@ -38,61 +37,6 @@ class RecyclableFormState extends State<RecyclableForm> {
     const DropdownMenuItem(value: "bag", child: Text("Bag")),
     const DropdownMenuItem(value: "clamshell", child: Text("Clam Shell"))
   ];
-
-  /*
-  List<DropdownMenuItem<String>> metalShapes = [
-    const DropdownMenuItem(value: "soda can", child: Text("Soda Can")),
-    const DropdownMenuItem(value: "scrap", child: Text("Scrap Metal")),
-    const DropdownMenuItem(value: "tin can", child: Text("Tin Can")),
-    const DropdownMenuItem(value: "foil", child: Text("Foil")),
-  ];
-
-
-  List<DropdownMenuItem<String>> shapeDropdown(String material) {
-    List<DropdownMenuItem<String>> menuItems = [];
-
-    switch(material) {
-      case 'plastic':
-        menuItems = [
-          const DropdownMenuItem(value: "wide mouth bottle", child: Text("Wide-Mouth Bottle")),
-          const DropdownMenuItem(value: "narrow mouth bottle", child: Text("Narrow-Mouth Bottle")),
-          const DropdownMenuItem(value: "bag", child: Text("Bag")),
-          const DropdownMenuItem(value: "clamshell", child: Text("Clam Shell")),
-        ];
-        break;
-      case 'metal':
-        menuItems = [
-          const DropdownMenuItem(value: "soda can", child: Text("Soda Can")),
-          const DropdownMenuItem(value: "scrap", child: Text("Scrap Metal")),
-          const DropdownMenuItem(value: "tin can", child: Text("Tin Can")),
-          const DropdownMenuItem(value: "foil", child: Text("Foil")),
-        ];
-        break;
-      default:
-        menuItems = [];
-
-    }
-    return menuItems;
-  }
-*/
-  Future<void> savingData(formKey) async {
-    final validation = formKey.currentState?.validate();
-    if (!validation!) {
-      return;
-    }
-    formKey.currentState!.save();
-  }
-
-  OutlineInputBorder inputFormDeco() {
-    return OutlineInputBorder(
-      borderRadius: BorderRadius.circular(20.0),
-      borderSide:
-      const BorderSide(
-          width: 1.0,
-          color: Colors.lightGreen,
-          style: BorderStyle.solid),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,54 +54,25 @@ class RecyclableFormState extends State<RecyclableForm> {
             onChanged: (String? newValue) async {
               savingData(formKey);
 
-              const url = 'http://127.0.0.1:5000/locations';
+              const url = 'http://127.0.0.1:5000/location';
               final response = await http.get(Uri.parse(url));
-              final decoded = json.decode(response.body) as Map<String, dynamic>;
+              print(response);
+              //final decoded = json.decode(response.body) as Map<String, dynamic>;
               setState(() {
-                instructions = decoded['instructions'];
+                //instructions = decoded['instructions'];
                 material = newValue!;
                 print(material);
               });
-
-              print(instructions);
-
-              /*
-              const url = 'http://127.0.0.1:5000/locationFeedback';
-              final response = await http.post(
-                Uri.parse(url),
-                body: json.encode({'selectedMaterial': selectedValue, 'shape': shape, 'num': num, 'city': widget.city})
-              );*/
-
-
             },
           ),
-          Text(instructions),
-          /*if (material == 'plastic')
-            DropdownButtonFormField<String>(
-              decoration: InputDecoration(
-                enabledBorder: inputFormDeco(),
-                focusedBorder: inputFormDeco(),
-              ),
-              value: shape,
-              items: menuItems,
-              onChanged: (String? newValue2) async {
-                savingData(formKey);
-                /*
-                        const url = 'http://127.0.0.1:5000/locationFeedback';
-                        final response = await http.post(
-                          Uri.parse(url),
-                          body: json.encode({'selectedMaterial': selectedValue, 'shape': shape, 'num': num, 'city': widget.city})
-                        );*/
-                print(shape);
-                setState(() {
-                  shape = newValue2!;
-                  print(shape);
-                });
-              },
-            ),*/
-
           ElevatedButton(
               onPressed: () async {
+                savingData(formKey);
+                print('material: $material');     //interpolation instead of concatenation
+                print('shape: $shape');
+                /*if (formKey.currentState!.validate()) {
+                  formKey.currentState?.save();
+                }*/
                 const url = 'http://127.0.0.1:5000/locationFeedback';
                 final response = await http.post(
                     Uri.parse(url),
@@ -167,18 +82,21 @@ class RecyclableFormState extends State<RecyclableForm> {
               },
               child: const Text("Is this recyclable?")
           ),
+          ElevatedButton(
+            onPressed: () async {
+              const url = 'http://127.0.0.1:5000/locationFeedback';
+              final response = await http.get(Uri.parse(url));
+              final decoded =json.decode(response.body) as Map<String, dynamic>;
+              setState(() {
+                finalResponse = decoded['instructions'];
+                print(finalResponse);
+              });
+            },
+            child: const Text("Get instructions"),
+          ),
+          Text(finalResponse, style: const TextStyle(fontSize: 24))
         ],
       ),
     );
   }
 }
-
-Future<void> savingData(formKey) async {
-  final validation = formKey.currentState?.validate();
-  if (!validation!) {
-    return;
-  }
-  formKey.currentState!.save();
-}
-
-
