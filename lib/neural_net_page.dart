@@ -44,3 +44,12 @@ class NeuralNetPageState extends State<NeuralNetPage> {
     );
   }
 }
+/*
+        const url = 'http://127.0.0.1:5000/locationFeedback';
+        final response = await http.get(Uri.parse(url));
+        final decoded = json.decode(response.body) as Map<String, dynamic>;
+        String instructions = decoded['instructions'];
+
+        print('INSTRUCTIONS' + instructions);
+        const Text('doing stuff');
+ */

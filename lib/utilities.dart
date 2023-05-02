@@ -1,8 +1,5 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'widgets/form.dart';
-import 'utilities.dart';
+
 
 OutlineInputBorder inputFormDeco() {
   return OutlineInputBorder(
@@ -11,7 +8,8 @@ OutlineInputBorder inputFormDeco() {
     const BorderSide(
         width: 1.0,
         color: Colors.lightGreen,
-        style: BorderStyle.solid),
+        style: BorderStyle.solid
+    ),
   );
 }
 

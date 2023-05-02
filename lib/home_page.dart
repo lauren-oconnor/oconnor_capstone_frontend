@@ -31,7 +31,7 @@ class HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: const Text('Recyclops Recycling App')
+          title: const Text('Recyclops Recycling App Homepage')
       ),
       body: SizedBox(
         width: double.infinity,

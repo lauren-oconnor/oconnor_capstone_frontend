@@ -38,6 +38,12 @@ class LocationPageState extends State<LocationPage> {
                     enabledBorder: inputFormDeco(),
                     focusedBorder: inputFormDeco(),
                   ),
+                  onSaved:  (value) {
+                    city = value!;
+                    city = city.toLowerCase();
+                    //savingData(formKey);
+                  }
+                  /*
                   onFieldSubmitted: (value){
                     city = value;
                     city = city.toLowerCase();
@@ -45,14 +51,15 @@ class LocationPageState extends State<LocationPage> {
                     Navigator.push(context, MaterialPageRoute(
                         builder: (context) => FormPage(city: city))
                     );
-                  },
+                  },*/
                 ),
               ),
             ),
+            const Text('hint: choose Anchorage, Denver, or Paris'),
             ElevatedButton(
                 onPressed: () async {
                   savingData(formKey);
-                  const url = 'http//127.0.0.1:/city';
+                  const url = 'http//127.0.0.1:/locationFeedback';
                   final response = await http.post(
                       Uri.parse(url), body: json.encode({'city': city})
                   );
