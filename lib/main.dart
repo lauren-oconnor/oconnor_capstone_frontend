@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'location_page.dart';
 import 'home_page.dart';
 import 'neural_net_page.dart';
-import 'form_page.dart';
-import 'package:oconnor_capstone_frontend/search_results_page.dart';
+
 
 void main() {
   runApp(const MyApp());

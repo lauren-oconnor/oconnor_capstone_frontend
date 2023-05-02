@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'widgets/form.dart';
 import 'utilities.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class FormPage extends StatelessWidget {
   FormPage({super.key, required this.city});
