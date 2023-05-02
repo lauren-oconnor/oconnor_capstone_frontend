@@ -1,10 +1,12 @@
-import 'dart:convert';
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'utilities.dart';
 import 'form_page.dart';
 
 
+///Obtain the user's municipality and select the corresponding database.
+///Redirect to the form page when the user submits their response.
 class LocationPage extends StatefulWidget{
   const LocationPage({super.key});
 
@@ -41,17 +43,7 @@ class LocationPageState extends State<LocationPage> {
                   onSaved:  (value) {
                     city = value!;
                     city = city.toLowerCase();
-                    //savingData(formKey);
                   }
-                  /*
-                  onFieldSubmitted: (value){
-                    city = value;
-                    city = city.toLowerCase();
-                    savingData(formKey);
-                    Navigator.push(context, MaterialPageRoute(
-                        builder: (context) => FormPage(city: city))
-                    );
-                  },*/
                 ),
               ),
             ),
@@ -59,10 +51,6 @@ class LocationPageState extends State<LocationPage> {
             ElevatedButton(
                 onPressed: () async {
                   savingData(formKey);
-                  const url = 'http//127.0.0.1:/locationFeedback';
-                  final response = await http.post(
-                      Uri.parse(url), body: json.encode({'city': city})
-                  );
                   Navigator.push(context, MaterialPageRoute(
                       builder: (context) => FormPage(city: city))
                   );

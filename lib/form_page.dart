@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'widgets/form.dart';
 import 'utilities.dart';
 
+
+/// Display recyclable form and retrieve user entries.
 class FormPage extends StatelessWidget {
   FormPage({super.key, required this.city});
 

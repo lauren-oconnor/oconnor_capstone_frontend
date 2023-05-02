@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-
+///Create consistent style throughout the application.
 OutlineInputBorder inputFormDeco() {
   return OutlineInputBorder(
     borderRadius: BorderRadius.circular(20.0),
@@ -13,7 +13,7 @@ OutlineInputBorder inputFormDeco() {
   );
 }
 
-
+///Save state in those stateful widgets in which this function is called.
 Future<void> savingData(formKey) async {
   final validation = formKey.currentState?.validate();
   if (!validation!) {
@@ -22,9 +22,8 @@ Future<void> savingData(formKey) async {
   formKey.currentState!.save();
 }
 
-///Adds state initiation capabilities to Stateless widgets.
+/// Add state initiation capabilities to Stateless widgets.
 ///
-/// see:
 ///citation: https://medium.com/filledstacks/how-to-call-a-function-on-start-in-flutter-stateless-widgets-28d90ab3bf49
 class StatefulWrapper extends StatefulWidget {
   final Function onInit;
@@ -35,7 +34,7 @@ class StatefulWrapper extends StatefulWidget {
   StatefulWrapperState createState() => StatefulWrapperState();
 }
 
-
+/// Implement state for StatefulWrapper widget.
 class StatefulWrapperState extends State<StatefulWrapper> {
   @override
   void initState() {

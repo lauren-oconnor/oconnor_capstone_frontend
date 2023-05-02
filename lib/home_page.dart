@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:oconnor_capstone_frontend/location_page.dart';
-import 'neural_net_page.dart';
 
 
+/// Offer user the option to check the recyclability of an item.
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -50,14 +50,6 @@ class HomePageState extends State<HomePage> {
 
             const SizedBox(height: 40),
 
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(
-                  builder: (context) => const NeuralNetPage())
-                );
-              },
-              child: const Text('Go to Neural Network'),
-            ),
           ],
         ),
       ),

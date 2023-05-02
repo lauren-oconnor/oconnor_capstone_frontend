@@ -6,6 +6,9 @@ import '../utilities.dart';
 import 'package:oconnor_capstone_frontend/search_results_page.dart';
 
 
+/// Conditionally display form fields to user and obtain their responses.
+/// Navigate to Search Results Page when the user submits the form.
+/// Send/get data from the backend endpoint to query the database.
 class RecyclableForm extends StatefulWidget {
   const RecyclableForm({super.key, required this.city});
   final String city;

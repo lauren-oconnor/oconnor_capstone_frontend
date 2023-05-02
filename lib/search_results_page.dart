@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 
+///Display the results of the database query from form.dart.
 class ResultsPage extends StatelessWidget {
   ResultsPage({super.key, required this.city, required this.shape, required this.instructions, required this.material, required this.plasticNum});
 
